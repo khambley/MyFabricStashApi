@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using MyFabricStashApi.Data;
+using System.Data.SqlClient;
 
 namespace MyFabricStashApi
 {
@@ -31,6 +34,14 @@ namespace MyFabricStashApi
 			{
 				c.SwaggerDoc("v1", new OpenApiInfo { Title = "MyFabricStashApi", Version = "v1" });
 			});
+
+			// use app secrets file instead of hard-coded password in connection string
+			SqlConnectionStringBuilder connectionStringBuilder = new SqlConnectionStringBuilder(Configuration.GetConnectionString("MyFabricStashContext"));
+			//connectionStringBuilder.Password = Configuration["DbPassword"];
+			var connectionString = connectionStringBuilder.ConnectionString;
+
+		    services.AddDbContext<MyFabricStashContext>(options =>
+		            options.UseSqlServer(connectionString));
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
